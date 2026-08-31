@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seasonal Event Intelligence — Astha Jain Portfolio</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --s0: #f9f9f7;
+      --s1: #fcfcfb;
+      --ink: #0b0b0b;
+      --sec: #52514e;
+      --muted: #898781;
+      --grid: #e1e0d9;
+      --border: rgba(11,11,11,.10);
+      --blue: #6366f1;
+      --orange: #eb6834;
+      --aqua: #1baf7a;
+      --yellow: #eda100;
+      --pink: #e87ba4;
+      --violet: #4a3aa7;
+      --good: #0ca30c;
+      --warn: #fab219;
+      --crit: #d03b3b;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--s0);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* --- Banners --- */
+    .banner-conf {
+      background: var(--ink);
+      color: #fff;
+      text-align: center;
+      padding: 5px 16px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .banner-demo {
+      background: var(--warn);
+      color: var(--ink);
+      text-align: center;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    /* --- Sticky Nav --- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      height: 48px;
+      background: rgba(249,249,247,0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+
+    .nav-brand {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .nav-sep { flex: 1; }
+
+    .nav-select-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-select-wrap select {
+      appearance: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 28px 6px 10px;
+      font-size: 12px;
+      color: var(--sec);
+      cursor: pointer;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .nav-select-wrap::after {
+      content: '\25BE';
+      position: absolute;
+      right: 9px;
+      pointer-events: none;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* --- Hero --- */
+    .hero {
+      padding: 44px 24px 28px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      font-size: clamp(26px, 4vw, 42px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      margin-bottom: 14px;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: var(--sec);
+      max-width: 700px;
+      line-height: 1.65;
+    }
+
+    /* --- Tab Bar --- */
+    .tab-bar {
+      display: flex;
+      gap: 2px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--grid);
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tab-bar::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      padding: 10px 18px;
+      border: none;
+      background: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+      font-family: inherit;
+    }
+
+    .tab-btn:hover { color: var(--ink); }
+
+    .tab-btn.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+      font-weight: 700;
+    }
+
+    /* --- Tab Panels --- */
+    .tab-panel {
+      display: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    .tab-panel.active { display: block; }
+
+    /* --- KPI Row --- */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .kpi {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--sec);
+      margin-top: 5px;
+    }
+
+    /* --- Chart Grid --- */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+    }
+
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: span 3; }
+
+    /* --- Chart Cards --- */
+    .card {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 20px 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .chart-wrap { position: relative; }
+    .h220 { height: 220px; }
+    .h260 { height: 260px; }
+    .h300 { height: 300px; }
+    .h320 { height: 320px; }
+
+    /* --- Decision Box --- */
+    .decision-box {
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(74,58,167,0.06));
+      border: 1px solid rgba(99,102,241,0.22);
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+
+    .decision-box h3 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--violet);
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+
+    .decision-box p {
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.75;
+    }
+
+    .decision-box .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      background: rgba(99,102,241,0.10);
+      border: 1px solid rgba(99,102,241,0.20);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: var(--violet);
+      font-weight: 500;
+    }
+
+    /* --- Timeline --- */
+    .timeline-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .tnode {
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
+      min-width: 100px;
+      color: #fff;
+    }
+
+    .tarrow {
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 300;
+    }
+
+    .timeline-insight {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: rgba(99,102,241,0.06);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      font-size: 12px;
+      color: var(--sec);
+      line-height: 1.65;
+    }
+
+    /* --- Accuracy Box --- */
+    .acc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .acc-item {
+      text-align: center;
+      padding: 16px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .acc-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .acc-val { font-size: 28px; font-weight: 900; letter-spacing: -0.03em; }
+    .acc-sub { font-size: 10px; color: var(--sec); margin-top: 4px; }
+
+    /* --- Footer --- */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--grid);
+    }
+
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* --- Responsive --- */
+    @media (max-width: 820px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .span-2, .span-3 { grid-column: span 1; }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .hero { padding: 28px 16px 20px; }
+      .tab-panel { padding: 24px 16px 40px; }
+      .tab-bar, nav { padding: 0 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .kpi-value { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Banners -->
+  <div class="banner-conf">CONFIDENTIAL · Walmart internal data abstracted. Numbers represent approximated impacts from real demand planning work. Not for external distribution.</div>
+  <div class="banner-demo">DEMO DASHBOARD · Directional estimates only — not for redistribution</div>
+
+  <!-- Nav -->
+  <nav>
+    <a class="nav-brand" href="https://asthaj12.github.io/">AJ · Portfolio</a>
+    <div class="nav-sep"></div>
+    <div class="nav-select-wrap">
+      <select onchange="if(this.value){window.location.href=this.value;this.value=''}">
+        <option value="">Navigate portfolio &rarr;</option>
+        <option value="https://asthaj12.github.io/forecast-governance/">Forecast Governance</option>
+        <option value="https://asthaj12.github.io/seasonal-event-intelligence/" selected>Seasonal Planning</option>
+        <option value="https://asthaj12.github.io/pricing-demand-response/">Pricing &amp; Demand Response</option>
+        <option value="https://asthaj12.github.io/npi-launch-planning/">NPI Launch Planning</option>
+        <option value="https://asthaj12.github.io/fom-backtesting/">FOM Backtesting</option>
+      </select>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <p class="hero-eyebrow">Demand Planning · Walmart</p>
+    <h1>Seasonal &amp; Event<br>Intelligence</h1>
+    <p>Four planning stories across Back-to-School, Cold &amp; Flu, Lent/Easter, and Major Retail Events — ~$316M in repositioned demand through signal-timing advantage, event-study decomposition, and false-positive elimination.</p>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn active" role="tab" onclick="switchTab(0)">Portfolio Overview</button>
+    <button class="tab-btn" role="tab" onclick="switchTab(1)">Back-to-School</button>
+    <button class="tab-btn" role="tab" onclick="switchTab(2)">Cold &amp; Flu</button>
+    <button class="tab-btn" role="tab" onclick="switchTab(3)">Lent &amp; Easter</button>
+    <button class="tab-btn" role="tab" onclick="switchTab(4)">Major Retail Events</button>
+  </div>
+
+  <!-- ===== TAB 0: Portfolio Overview ===== -->
+  <div class="tab-panel active" id="panel-0" role="tabpanel">
+
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Total Demand Repositioned</div>
+        <div class="kpi-value">~$316M</div>
+        <div class="kpi-sub">Across all 4 stories</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Largest Single Story</div>
+        <div class="kpi-value">$160M</div>
+        <div class="kpi-sub">Back-to-School ($8B portfolio)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">False Positives Eliminated</div>
+        <div class="kpi-value">1.5M</div>
+        <div class="kpi-sub">Units · Major Retail Events</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Post-Season Excess Reduced</div>
+        <div class="kpi-value">~$100M+</div>
+        <div class="kpi-sub">Major Events portfolio</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Lead Time Extension</div>
+        <div class="kpi-value">3–6 mo</div>
+        <div class="kpi-sub">Signal advantage vs. base forecast</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div class="card">
+        <div class="card-title">Impact by Story — Demand Repositioned ($M)</div>
+        <div class="card-desc">Post-season excess or demand mis-positioning addressed through planning intervention</div>
+        <div class="chart-wrap h260"><canvas id="c-ov-bar"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Signal Timing Advantage — Confidence Index vs. Base Forecast</div>
+        <div class="card-desc">Weeks before season start — when actionable signal emerged (early model vs. base forecast)</div>
+        <div class="chart-wrap h260"><canvas id="c-ov-timing"></canvas></div>
+      </div>
+    </div>
+
+    <div class="decision-box">
+      <h3>The Common Thread Across All 4 Stories</h3>
+      <p>
+        Acting before the base forecast has signal requires separating <strong>seasonal shape from magnitude</strong>, and separating <strong>event demand from organic trend</strong>. In every story, the base forecast relied on last-year actuals as the primary signal — which fails whenever severity, timing, geography, or event characteristics shift year-over-year. The consistent fix: build a causal model that encodes <em>why</em> demand moves, not just <em>when</em> it moved last year.
+      </p>
+      <div class="pills">
+        <span class="pill">BTS: shape/magnitude separation + new-item ramps</span>
+        <span class="pill">Cold/Flu: severity + geography + substitution clusters</span>
+        <span class="pill">Easter: event-study indexing by weeks-to-holiday</span>
+        <span class="pill">Events: item-criticality engine + false-positive elimination</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB 1: Back-to-School ===== -->
+  <div class="tab-panel" id="panel-1" role="tabpanel">
+
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Portfolio Size</div>
+        <div class="kpi-value">$8B</div>
+        <div class="kpi-sub">BTS merchandise</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Excess Reduced</div>
+        <div class="kpi-value">$160M</div>
+        <div class="kpi-sub">Post-season inventory</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Lead Time Advantage</div>
+        <div class="kpi-value">3–6 mo</div>
+        <div class="kpi-sub">vs. base forecast signal</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Positioning Improvement</div>
+        <div class="kpi-value">2pp</div>
+        <div class="kpi-sub">On $8B portfolio</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Categories</div>
+        <div class="kpi-value">6</div>
+        <div class="kpi-sub">Supplies, apparel, tech, backpacks…</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div class="card">
+        <div class="card-title">Signal Timing — Weeks Before Season Start</div>
+        <div class="card-desc">Early signal model vs. base forecast — confidence index from T−24 to season start (T=0)</div>
+        <div class="chart-wrap h300"><canvas id="c-bts-signal"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Post-Season Excess by Category ($M) — Before vs. After</div>
+        <div class="card-desc">2pp repositioning improvement distributed across 6 categories; intervention at committed-buy</div>
+        <div class="chart-wrap h300"><canvas id="c-bts-excess"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Seasonal Shape Model — Ramp · Peak · Normalization</div>
+        <div class="card-desc">Separating shape from magnitude allows early commitment without betting on total-season magnitude</div>
+        <div class="chart-wrap h220"><canvas id="c-bts-shape"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Decision Timeline — Committed-Buy to Clearance</div>
+        <div class="card-desc">The early signal arrives exactly when buyers need to commit — 14 weeks before base forecast catches up</div>
+        <div style="padding:8px 0;">
+          <div class="timeline-row">
+            <div class="tnode" style="background:var(--blue);">Committed<br>Buy Decision<br><span style="font-weight:400;font-size:9px;">T&minus;20 wk</span></div>
+            <div class="tarrow">&rarr;</div>
+            <div class="tnode" style="background:var(--aqua);">Early Signal<br>Available<br><span style="font-weight:400;font-size:9px;">T&minus;20 wk</span></div>
+            <div class="tarrow">&rarr;</div>
+            <div class="tnode" style="background:var(--orange);">Base Forecast<br>Emerges<br><span style="font-weight:400;font-size:9px;">T&minus;6 wk</span></div>
+            <div class="tarrow">&rarr;</div>
+            <div class="tnode" style="background:var(--violet);">Season<br>Start<br><span style="font-weight:400;font-size:9px;">T = 0</span></div>
+            <div class="tarrow">&rarr;</div>
+            <div class="tnode" style="background:var(--yellow);color:var(--ink);">Peak<br>Demand<br><span style="font-weight:400;font-size:9px;">T+5 wk</span></div>
+            <div class="tarrow">&rarr;</div>
+            <div class="tnode" style="background:var(--crit);">Clearance<br>Risk<br><span style="font-weight:400;font-size:9px;">T+10 wk</span></div>
+          </div>
+          <div class="timeline-insight">
+            <strong>Key insight:</strong> The committed-buy decision happens at T&minus;20 weeks, but the base forecast only materializes at T&minus;6. Astha's model generated actionable signal at T&minus;20 — the same moment buyers need to commit — enabling 2pp repositioning before inventory was locked in.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB 2: Cold & Flu ===== -->
+  <div class="tab-panel" id="panel-2" role="tabpanel">
+
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Category Size</div>
+        <div class="kpi-value">$1.2B</div>
+        <div class="kpi-sub">Cold/Flu OTC</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Demand Repositioned</div>
+        <div class="kpi-value">$36M</div>
+        <div class="kpi-sub">3pp improvement</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Improvement</div>
+        <div class="kpi-value">3pp</div>
+        <div class="kpi-sub">Positioning accuracy</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Key Shift Factor</div>
+        <div class="kpi-value">Geo + Sev</div>
+        <div class="kpi-sub">Geography + Severity signals</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Clusters Built</div>
+        <div class="kpi-value">5</div>
+        <div class="kpi-sub">Customer-need clusters</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div class="card">
+        <div class="card-title">Model Accuracy by Region — LY Model vs. New Model (MAPE %)</div>
+        <div class="card-desc">Largest gains where flu severity and timing shifted most vs. prior year — LY-copy fails exactly here</div>
+        <div class="chart-wrap h300"><canvas id="c-cf-regional"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Flu Severity Index vs. OTC Demand Signal</div>
+        <div class="card-desc">CDC-proxy severity overlaid with demand — strong leading correlation that LY benchmark model completely missed</div>
+        <div class="chart-wrap h300"><canvas id="c-cf-severity"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Customer-Need Cluster Breakdown</div>
+        <div class="card-desc">Segmenting by symptom cluster enables sub-category positioning and brand/PL substitution modeling</div>
+        <div class="chart-wrap h220"><canvas id="c-cf-donut"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Geographic Severity Shift YoY (Index Points)</div>
+        <div class="card-desc">Regions with largest severity shift had highest LY model MAPE — severity geography explains forecast error</div>
+        <div class="chart-wrap h220"><canvas id="c-cf-geo"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB 3: Lent & Easter ===== -->
+  <div class="tab-panel" id="panel-3" role="tabpanel">
+
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Category Population</div>
+        <div class="kpi-value">$4B</div>
+        <div class="kpi-sub">Easter grocery ($25B US &times; ~16% Walmart share)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">True Event Demand Separated</div>
+        <div class="kpi-value">$120M</div>
+        <div class="kpi-sub">From spring seasonality</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Event Study Design</div>
+        <div class="kpi-value">Applied</div>
+        <div class="kpi-sub">Indexed by weeks-to-Easter</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Holiday Indexing</div>
+        <div class="kpi-value">3 Years</div>
+        <div class="kpi-sub">History aligned to holiday, not calendar</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">False Spring Uplift</div>
+        <div class="kpi-value">Removed</div>
+        <div class="kpi-sub">Decomposed from event demand</div>
+      </div>
+    </div>
+
+    <div class="card span-3" style="margin-bottom:18px;">
+      <div class="card-title">Easter Demand Indexed by Weeks-to-Holiday — 3 Years of History</div>
+      <div class="card-desc">When demand is indexed by weeks-to-Easter (not calendar weeks), all 3 years align — proof that demand follows the holiday, not the season</div>
+      <div class="chart-wrap h300"><canvas id="c-easter-indexed"></canvas></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Demand Driver by Category — Follows Easter vs. Follows Spring</div>
+        <div class="card-desc">Event-study test: does demand peak index to the holiday or to calendar/weather patterns?</div>
+        <div class="chart-wrap h280"><canvas id="c-easter-cat"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Event Demand vs. Seasonal Baseline — By Week</div>
+        <div class="card-desc">True Easter lift is concentrated in a 2-week window; baseline captures ongoing spring demand underneath</div>
+        <div class="chart-wrap h280"><canvas id="c-easter-stacked"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB 4: Major Retail Events ===== -->
+  <div class="tab-panel" id="panel-4" role="tabpanel">
+
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Events in Scope</div>
+        <div class="kpi-value">10+</div>
+        <div class="kpi-sub">Full retail calendar</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">False Positives Eliminated</div>
+        <div class="kpi-value">1.5M</div>
+        <div class="kpi-sub">Units across all events</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Post-Event Excess Mitigated</div>
+        <div class="kpi-value">$100M+</div>
+        <div class="kpi-sub">vs. blanket uplift approach</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Avg Unit Retail</div>
+        <div class="kpi-value">$7–8</div>
+        <div class="kpi-sub">Per false-positive unit</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Event Shape Model</div>
+        <div class="kpi-value">Applied</div>
+        <div class="kpi-sub">Build &rarr; peak &rarr; normalization</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div class="card">
+        <div class="card-title">Events Ranked by Relative Demand Impact</div>
+        <div class="card-desc">Basis for item-criticality scoring — not all events carry equal weight or false-positive risk</div>
+        <div class="chart-wrap h320"><canvas id="c-ev-ranked"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">True Event Shape vs. Flat Uplift Assumption</div>
+        <div class="card-desc">Flat uplift dramatically over-forecasts tail weeks — true shape is pre-event build &rarr; peak &rarr; rapid normalization</div>
+        <div class="chart-wrap h320"><canvas id="c-ev-shape"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">False Positive Rate by Event &amp; Category (%)</div>
+        <div class="card-desc">% of event uplift units where demand was explained by organic trend — not the event itself</div>
+        <div class="chart-wrap h260"><canvas id="c-fp-rate"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">False Positive Root Causes — 1.5M Units</div>
+        <div class="card-desc">Breakdown of what drove over-forecasting across events; organic trend was the dominant misattribution</div>
+        <div class="chart-wrap h260"><canvas id="c-fp-donut"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Built by <strong>Astha Jain</strong> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/in/astha-jain-/" target="_blank" rel="noopener">LinkedIn</a> &nbsp;&middot;&nbsp; Seasonal Event Intelligence &middot; Walmart Demand Planning Portfolio</p>
+    <p style="margin-top:6px;font-size:11px;">Numbers are directional estimates abstracted from real demand-planning work. Not for external distribution.</p>
+  </footer>
+
+  <script>
+    // ── Tab switching ──────────────────────────────────────────────
+    function switchTab(idx) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', i === idx);
+      });
+      document.querySelectorAll('.tab-panel').forEach((p, i) => {
+        p.classList.toggle('active', i === idx);
+      });
+    }
+
+    // ── Chart.js global defaults ───────────────────────────────────
+    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = '#898781';
+
+    const G = 'rgba(225,224,217,0.55)';  // grid line color
+
+    function scaleX(title) {
+      return {
+        grid: { color: G },
+        ticks: { color: '#898781' },
+        title: title
+          ? { display: true, text: title, color: '#52514e', font: { size: 10 } }
+          : { display: false }
+      };
+    }
+
+    function scaleY(title, extra) {
+      return Object.assign({
+        grid: { color: G },
+        ticks: { color: '#898781' },
+        title: title
+          ? { display: true, text: title, color: '#52514e', font: { size: 10 } }
+          : { display: false }
+      }, extra || {});
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // TAB 0 — PORTFOLIO OVERVIEW
+    // ══════════════════════════════════════════════════════════════
+
+    // Horizontal bar — Impact by story
+    new Chart(document.getElementById('c-ov-bar'), {
+      type: 'bar',
+      data: {
+        labels: ['Back-to-School', 'Lent & Easter', 'Major Events', 'Cold & Flu'],
+        datasets: [{
+          label: '$M Repositioned',
+          data: [160, 120, 100, 36],
+          backgroundColor: ['#6366f1', '#1baf7a', '#eb6834', '#eda100'],
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' $' + ctx.raw + 'M repositioned' } }
+        },
+        scales: {
+          x: scaleX('Demand Repositioned ($M)'),
+          y: { grid: { display: false }, ticks: { color: '#52514e', font: { weight: '500' } } }
+        }
+      }
+    });
+
+    // Line — Signal timing advantage
+    new Chart(document.getElementById('c-ov-timing'), {
+      type: 'line',
+      data: {
+        labels: ['T−24','T−20','T−16','T−12','T−8','T−6','T−4','T−2','T=0'],
+        datasets: [
+          {
+            label: 'Early Signal Model',
+            data: [14, 55, 70, 80, 88, 91, 94, 97, 100],
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99,102,241,0.10)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 3,
+            borderWidth: 2.5
+          },
+          {
+            label: 'Base Forecast',
+            data: [3, 5, 7, 10, 18, 55, 80, 92, 100],
+            borderColor: '#898781',
+            borderDash: [6, 4],
+            tension: 0.4,
+            fill: false,
+            pointRadius: 3,
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: scaleX('Weeks Before Season Start'),
+          y: scaleY('Signal Confidence Index', { min: 0, max: 110 })
+        }
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // TAB 1 — BACK-TO-SCHOOL
+    // ══════════════════════════════════════════════════════════════
+
+    // Line — BTS signal timing
+    new Chart(document.getElementById('c-bts-signal'), {
+      type: 'line',
+      data: {
+        labels: ['T−24','T−22','T−20','T−18','T−16','T−14','T−12','T−10','T−8','T−6','T−4','T−2','T=0'],
+        datasets: [
+          {
+            label: 'Early Signal Model (Astha)',
+            data: [10, 28, 55, 65, 72, 78, 82, 86, 89, 92, 95, 98, 100],
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99,102,241,0.12)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 3,
+            borderWidth: 2.5
+          },
+          {
+            label: 'Base Forecast Signal',
+            data: [2, 3, 4, 4, 5, 7, 9, 12, 20, 55, 80, 93, 100],
+            borderColor: '#d03b3b',
+            borderDash: [6, 4],
+            tension: 0.4,
+            fill: false,
+            pointRadius: 3,
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: scaleX('Weeks Before Season Start (T=0)'),
+          y: scaleY('Signal Confidence Index', { min: 0, max: 110 })
+        }
+      }
+    });
+
+    // Grouped bar — BTS excess before/after
+    new Chart(document.getElementById('c-bts-excess'), {
+      type: 'bar',
+      data: {
+        labels: ['School Supplies','Apparel','Tech Accessories','Backpacks','Stationery','Other'],
+        datasets: [
+          {
+            label: 'Before Intervention ($M)',
+            data: [40, 28, 22, 18, 12, 15],
+            backgroundColor: 'rgba(208,59,59,0.75)',
+            borderRadius: 4,
+            borderSkipped: false
+          },
+          {
+            label: 'After 2pp Repositioning ($M)',
+            data: [32, 22, 17, 14, 10, 12],
+            backgroundColor: 'rgba(99,102,241,0.75)',
+            borderRadius: 4,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + ctx.raw + 'M' } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#52514e' } },
+          y: scaleY('Post-Season Excess ($M)')
+        }
+      }
+    });
+
+    // Line — BTS seasonal shape
+    new Chart(document.getElementById('c-bts-shape'), {
+      type: 'line',
+      data: {
+        labels: ['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8','Wk 9','Wk 10'],
+        datasets: [{
+          label: 'Demand Shape (indexed)',
+          data: [30, 52, 68, 83, 95, 100, 98, 74, 50, 28],
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.13)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#6366f1',
+          borderWidth: 2.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: scaleX('Season Week'),
+          y: scaleY('Demand Index (Peak = 100)', { min: 0 })
+        }
+      },
+      plugins: [{
+        id: 'phaseZones',
+        afterDraw(chart) {
+          const { ctx, chartArea: ca, scales: { x } } = chart;
+          ctx.save();
+          ctx.font = 'bold 9px -apple-system, sans-serif';
+          ctx.textAlign = 'center';
+          // Ramp: wk 1–4
+          ctx.fillStyle = 'rgba(27,175,122,0.08)';
+          ctx.fillRect(ca.left, ca.top, x.getPixelForValue(3) - ca.left, ca.height);
+          ctx.fillStyle = '#1baf7a';
+          ctx.fillText('RAMP', (ca.left + x.getPixelForValue(3)) / 2, ca.top + 14);
+          // Peak: wk 5–7
+          ctx.fillStyle = 'rgba(99,102,241,0.08)';
+          ctx.fillRect(x.getPixelForValue(3), ca.top, x.getPixelForValue(6) - x.getPixelForValue(3), ca.height);
+          ctx.fillStyle = '#6366f1';
+          ctx.fillText('PEAK', (x.getPixelForValue(3) + x.getPixelForValue(6)) / 2, ca.top + 14);
+          // Norm: wk 8–10
+          ctx.fillStyle = 'rgba(237,161,0,0.07)';
+          ctx.fillRect(x.getPixelForValue(6), ca.top, ca.right - x.getPixelForValue(6), ca.height);
+          ctx.fillStyle = '#eda100';
+          ctx.fillText('NORM.', (x.getPixelForValue(6) + ca.right) / 2, ca.top + 14);
+          ctx.restore();
+        }
+      }]
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // TAB 2 — COLD & FLU
+    // ══════════════════════════════════════════════════════════════
+
+    // Grouped bar — regional accuracy
+    new Chart(document.getElementById('c-cf-regional'), {
+      type: 'bar',
+      data: {
+        labels: ['Northeast','Southeast','Midwest','West','Mountain'],
+        datasets: [
+          {
+            label: 'LY Model MAPE (%)',
+            data: [28, 22, 19, 31, 34],
+            backgroundColor: 'rgba(208,59,59,0.75)',
+            borderRadius: 4,
+            borderSkipped: false
+          },
+          {
+            label: 'New Model MAPE (%)',
+            data: [14, 13, 11, 16, 18],
+            backgroundColor: 'rgba(27,175,122,0.75)',
+            borderRadius: 4,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#52514e' } },
+          y: scaleY('MAPE % — lower is better')
+        }
+      }
+    });
+
+    // Dual-axis line — severity + demand
+    new Chart(document.getElementById('c-cf-severity'), {
+      type: 'line',
+      data: {
+        labels: ['Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr'],
+        datasets: [
+          {
+            label: 'OTC Demand Index',
+            data: [10, 15, 32, 60, 88, 72, 40, 18],
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99,102,241,0.12)',
+            tension: 0.4,
+            fill: true,
+            yAxisID: 'y',
+            pointRadius: 3,
+            borderWidth: 2.5
+          },
+          {
+            label: 'Flu Severity Index (CDC-proxy)',
+            data: [12, 18, 36, 65, 92, 78, 44, 20],
+            borderColor: '#d03b3b',
+            borderDash: [5, 3],
+            tension: 0.4,
+            fill: false,
+            yAxisID: 'y1',
+            pointRadius: 3,
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: scaleX(null),
+          y: scaleY('OTC Demand Index'),
+          y1: {
+            position: 'right',
+            grid: { display: false },
+            ticks: { color: '#d03b3b' },
+            title: { display: true, text: 'Severity Index', color: '#d03b3b', font: { size: 10 } }
+          }
+        }
+      }
+    });
+
+    // Doughnut — customer-need clusters
+    new Chart(document.getElementById('c-cf-donut'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Cough Suppressants','Decongestants','Antihistamines','Multi-Symptom','Pain Reliever'],
+        datasets: [{
+          data: [28, 22, 19, 18, 13],
+          backgroundColor: ['#6366f1','#eb6834','#1baf7a','#eda100','#e87ba4'],
+          borderWidth: 2,
+          borderColor: '#fcfcfb',
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+          legend: { position: 'right', labels: { boxWidth: 11, font: { size: 10 } } },
+          tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + '%' } }
+        }
+      }
+    });
+
+    // Bar — geographic severity shift
+    new Chart(document.getElementById('c-cf-geo'), {
+      type: 'bar',
+      data: {
+        labels: ['Northeast','Mountain','West','Southeast','Midwest'],
+        datasets: [{
+          label: 'YoY Severity Index Shift (pts)',
+          data: [38, 32, 28, 18, 14],
+          backgroundColor: ['#d03b3b','#d03b3b','#eb6834','#eda100','#1baf7a'],
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' Severity shift: +' + ctx.raw + ' pts' } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#52514e' } },
+          y: scaleY('YoY Severity Index Δ (pts)')
+        }
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // TAB 3 — LENT & EASTER
+    // ══════════════════════════════════════════════════════════════
+
+    // Multi-line — Easter indexed demand
+    new Chart(document.getElementById('c-easter-indexed'), {
+      type: 'line',
+      data: {
+        labels: ['E−8','E−7','E−6','E−5','E−4','E−3','E−2','E−1','Easter','E+1','E+2'],
+        datasets: [
+          {
+            label: 'Year 1',
+            data: [18, 22, 28, 38, 54, 72, 87, 96, 100, 62, 30],
+            borderColor: '#6366f1',
+            tension: 0.4,
+            fill: false,
+            pointRadius: 3,
+            borderWidth: 2.5
+          },
+          {
+            label: 'Year 2',
+            data: [16, 21, 27, 36, 51, 70, 84, 94, 100, 58, 28],
+            borderColor: '#1baf7a',
+            borderDash: [5, 3],
+            tension: 0.4,
+            fill: false,
+            pointRadius: 3,
+            borderWidth: 2.5
+          },
+          {
+            label: 'Year 3',
+            data: [20, 25, 32, 42, 57, 75, 90, 97, 100, 65, 33],
+            borderColor: '#eda100',
+            borderDash: [2, 2],
+            tension: 0.4,
+            fill: false,
+            pointRadius: 3,
+            borderWidth: 2.5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: scaleX('Weeks Relative to Easter (E=0)'),
+          y: scaleY('Demand Index (Easter week = 100)', { min: 0 })
+        }
+      }
+    });
+
+    // Stacked bar — follows Easter vs Spring
+    new Chart(document.getElementById('c-easter-cat'), {
+      type: 'bar',
+      data: {
+        labels: ['Seafood','Candy','Ham/Pork','Eggs','Baking','Fresh Flowers','Produce'],
+        datasets: [
+          {
+            label: 'Follows Easter (event demand)',
+            data: [92, 88, 95, 78, 65, 35, 20],
+            backgroundColor: '#6366f1',
+            borderRadius: 0,
+            borderSkipped: false
+          },
+          {
+            label: 'Follows Spring (seasonal baseline)',
+            data: [8, 12, 5, 22, 35, 65, 80],
+            backgroundColor: 'rgba(27,175,122,0.6)',
+            borderRadius: 4,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { mode: 'index', intersect: false, callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } }
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { color: '#52514e', font: { size: 10 } } },
+          y: { stacked: true, ...scaleY('% of Demand Explained by Driver'), max: 100 }
+        }
+      }
+    });
+
+    // Stacked bar — event demand vs seasonal baseline
+    new Chart(document.getElementById('c-easter-stacked'), {
+      type: 'bar',
+      data: {
+        labels: ['E−4','E−3','E−2','E−1','Easter','E+1'],
+        datasets: [
+          {
+            label: 'Seasonal Baseline',
+            data: [40, 42, 44, 46, 42, 40],
+            backgroundColor: 'rgba(99,102,241,0.28)',
+            borderRadius: 0,
+            borderSkipped: false
+          },
+          {
+            label: 'True Easter Event Lift',
+            data: [4, 10, 36, 54, 60, 14],
+            backgroundColor: '#6366f1',
+            borderRadius: 4,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, title: { display: true, text: 'Week Relative to Easter', color: '#52514e', font: { size: 10 } } },
+          y: { stacked: true, ...scaleY('Demand Units (indexed)') }
+        }
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // TAB 4 — MAJOR RETAIL EVENTS
+    // ══════════════════════════════════════════════════════════════
+
+    // Horizontal bar — events ranked
+    new Chart(document.getElementById('c-ev-ranked'), {
+      type: 'bar',
+      data: {
+        labels: ['Thanksgiving','Christmas','Black Friday','Easter','Super Bowl','July 4th','Halloween','Labor Day','Memorial Day',"Valentine's"],
+        datasets: [{
+          label: 'Demand Impact Index',
+          data: [100, 95, 88, 72, 65, 58, 52, 42, 38, 32],
+          backgroundColor: ['#6366f1','#4a3aa7','#eb6834','#1baf7a','#eda100','#e87ba4','#d03b3b','#52514e','#898781','#fab219'],
+          borderRadius: 4,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' Impact index: ' + ctx.raw } }
+        },
+        scales: {
+          x: scaleX('Relative Demand Impact Index (Thanksgiving = 100)'),
+          y: { grid: { display: false }, ticks: { color: '#52514e', font: { size: 10 } } }
+        }
+      }
+    });
+
+    // Line — true event shape vs flat
+    new Chart(document.getElementById('c-ev-shape'), {
+      type: 'line',
+      data: {
+        labels: ['W−3','W−2','W−1','Event Wk','W+1','W+2','W+3'],
+        datasets: [
+          {
+            label: 'True Event Shape',
+            data: [22, 45, 78, 100, 58, 34, 18],
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99,102,241,0.12)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: '#6366f1',
+            borderWidth: 2.5
+          },
+          {
+            label: 'Flat Uplift (prior assumption)',
+            data: [80, 80, 80, 100, 80, 80, 80],
+            borderColor: '#d03b3b',
+            borderDash: [6, 4],
+            tension: 0,
+            fill: false,
+            pointRadius: 3,
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 11, padding: 12 } },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: scaleX('Weeks Relative to Event (Event Wk = 0)'),
+          y: scaleY('Demand Index (Event Week = 100)', { min: 0 })
+        }
+      }
+    });
+
+    // Bar — false positive rate by event/category
+    new Chart(document.getElementById('c-fp-rate'), {
+      type: 'bar',
+      data: {
+        labels: ['Super Bowl\nFood','Valentine\'s\nFloral','Labor Day\nGrilling','Halloween\nCandy','July 4th\nBeverages','Easter\nDecor','Christmas\nToys'],
+        datasets: [{
+          label: 'False Positive Rate (%)',
+          data: [52, 46, 38, 32, 28, 22, 15],
+          backgroundColor: ['#d03b3b','#d03b3b','#eb6834','#eb6834','#eda100','#fab219','#1baf7a'],
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' False positive rate: ' + ctx.raw + '%' } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#52514e', font: { size: 9 } } },
+          y: scaleY('% of Uplift Units = False Positives', { max: 60 })
+        }
+      }
+    });
+
+    // Doughnut — false positive causes
+    new Chart(document.getElementById('c-fp-donut'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Organic Trend Credited to Event','New Item Baseline Inflated','LY Event Anomaly Repeated'],
+        datasets: [{
+          data: [58, 22, 20],
+          backgroundColor: ['#6366f1','#eb6834','#1baf7a'],
+          borderWidth: 2,
+          borderColor: '#fcfcfb',
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+          legend: { position: 'right', labels: { boxWidth: 11, font: { size: 10 }, padding: 10 } },
+          tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + '% of 1.5M false positives' } }
+        }
+      }
+    });
+
+  </script>
+</body>
+</html>
