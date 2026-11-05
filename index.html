@@ -206,9 +206,9 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dd.open){dd
 </script>
 
 <div class="conf-banner">
-  <strong>Confidentiality notice:</strong> Walmart internal data abstracted. Numbers represent approximated impacts from real demand planning work. Not for external distribution.
+  <strong>Confidentiality notice:</strong> Retailer internal data abstracted. Numbers represent approximated impacts from real demand planning work. Not for external distribution.
 </div>
-<div class="demo-banner">⚠ DEMO DASHBOARD — Directional estimates only, not for redistribution. Demand Planning · Walmart. Seasonal &amp; Event Demand.</div>
+<div class="demo-banner">⚠ DEMO DASHBOARD — Directional estimates only, not for redistribution. Demand Planning · Retail. Seasonal &amp; Event Demand.</div>
 
 <div class="tab-bar" id="tabBar">
   <button class="tab-btn active" role="tab" onclick="switchTab(0)">Portfolio Overview</button>
@@ -419,7 +419,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dd.open){dd
     <div class="kpi bl">
       <div class="lbl">Category Population</div>
       <div class="val">$4B</div>
-      <div class="sub">Easter grocery ($25B US &times; ~16% Walmart share)</div>
+      <div class="sub">Easter grocery ($25B US &times; ~16% retailer share)</div>
     </div>
     <div class="kpi or">
       <div class="lbl">True Event Demand Separated</div>
@@ -531,7 +531,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dd.open){dd
   <a href="https://github.com/asthaj12" target="_blank" rel="noopener">GitHub ↗</a>
   <a href="https://asthaj12.github.io/" target="_blank" rel="noopener">Portfolio ↗</a>
   <a href="mailto:asthajain.sc@gmail.com">Email</a>
-  <span style="margin-left:auto;color:var(--muted)">Seasonal Event Intelligence · Walmart Demand Planning Portfolio · Numbers are directional estimates abstracted from real demand-planning work. Not for external distribution.</span>
+  <span style="margin-left:auto;color:var(--muted)">Seasonal Event Intelligence · Retail Demand Planning Portfolio · Numbers are directional estimates abstracted from real demand-planning work. Not for external distribution.</span>
 </footer>
 
 <script>
@@ -1024,7 +1024,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dd.open){dd
     new Chart(document.getElementById('c-ev-ranked'), {
       type: 'bar',
       data: {
-        labels: ['Thanksgiving','Christmas','Black Friday','Easter','Super Bowl','July 4th','Halloween','Labor Day','Memorial Day',"Valentine's"],
+        labels: ['Thanksgiving','Christmas','Holiday peak','Easter','Major sporting event','July 4th','Halloween','Labor Day','Memorial Day',"Valentine's"],
         datasets: [{
           label: 'Demand Impact Index',
           data: [100, 95, 88, 72, 65, 58, 52, 42, 38, 32],
@@ -1093,7 +1093,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dd.open){dd
     new Chart(document.getElementById('c-fp-rate'), {
       type: 'bar',
       data: {
-        labels: ['Super Bowl\nFood','Valentine\'s\nFloral','Labor Day\nGrilling','Halloween\nCandy','July 4th\nBeverages','Easter\nDecor','Christmas\nToys'],
+        labels: ['Major Sporting\nEvent Food','Valentine\'s\nFloral','Labor Day\nGrilling','Halloween\nCandy','July 4th\nBeverages','Easter\nDecor','Christmas\nToys'],
         datasets: [{
           label: 'False Positive Rate (%)',
           data: [52, 46, 38, 32, 28, 22, 15],
